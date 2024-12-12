@@ -1,0 +1,3 @@
+ADD R1 R1 #10
+ADD R1 R1 #10
+ADD R1 R1 #6
