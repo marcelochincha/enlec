@@ -1,5 +1,5 @@
 # enlec
-**ENLEC** is a simulator of a 16-bit CPU using a fictional ISA inspired by the ARM architecture, designed to create a computing system capable of low-level graphics operations (to-do).
+**enlec** is a simulator of a 16-bit CPU using a fictional ISA inspired by the ARM architecture, designed to create a computing system capable of low-level graphics operations (to-do).
 
 
 
