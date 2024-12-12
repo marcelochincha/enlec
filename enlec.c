@@ -11,11 +11,10 @@
 
 typedef unsigned short WORD;
 
-
 #define MEM_M_SIZE 4
 
-//SIZE IN WORDS
-#define MEM_SIZE MEM_M_SIZE * MEM_M_SIZE
+// SIZE IN WORDS
+#define MEM_SIZE MEM_M_SIZE *MEM_M_SIZE
 #define NREGS 8
 #define REG_PC 7
 
@@ -23,30 +22,30 @@ typedef unsigned short WORD;
 #define GET_BITS(value, shift, mask) (((value) >> (shift)) & (mask))
 #define GET_TYPE(instr) GET_BITS(instr, 14, 0b11)
 #define GET_I(instr) GET_BITS(instr, 13, 0b1)
-#define GET_L(instr) GET_BITS(instr,12, 0b1)
-#define GET_Z(instr) GET_BITS(instr,12,0b1)
+#define GET_L(instr) GET_BITS(instr, 12, 0b1)
+#define GET_Z(instr) GET_BITS(instr, 12, 0b1)
 
-//For DP DECODING
+// For DP DECODING
 #define GET_DP_FUNC(instr) GET_BITS(instr, 10, 0b111)
 #define GET_DP_SRC_D(instr) GET_BITS(instr, 7, 0b111)
 #define GET_DP_SRC_A(instr) GET_BITS(instr, 4, 0b111)
 #define GET_DP_SRC_B_IMM(instr) GET_BITS(instr, 0, 0b1111)
 #define GET_DP_SRC_B_REG(instr) GET_BITS(instr, 0, 0b111)
 
-//For MEM DECODING
-//01 IL XXX XXX ABCDEF 
-//2  2  3   3   6
-#define GET_MEM_SRC_D(instr) GET_BITS(instr,9,0b111)
-#define GET_MEM_SRC_A(instr) GET_BITS(instr,6,0b111)
-#define GET_MEM_SRC_B_IMM(instr) GET_BITS(instr,0,0b111111)
-#define GET_MEM_SRC_B_REG(instr) GET_BITS(instr,0,0b111)
+// For MEM DECODING
+// 01 IL XXX XXX ABCDEF
+// 2  2  3   3   6
+#define GET_MEM_SRC_D(instr) GET_BITS(instr, 9, 0b111)
+#define GET_MEM_SRC_A(instr) GET_BITS(instr, 6, 0b111)
+#define GET_MEM_SRC_B_IMM(instr) GET_BITS(instr, 0, 0b111111)
+#define GET_MEM_SRC_B_REG(instr) GET_BITS(instr, 0, 0b111)
 
-//For BCH DECODING
+// For BCH DECODING
 #define GET_JMP_IMM(instr) GET_BITS(instr, 0, 0b1111111111111)
 
 // MACHINE CODE
 
-//FUNCS
+// FUNCS
 #define ADD 0b000
 #define SUB 0b001
 #define AND 0b010
@@ -56,12 +55,11 @@ typedef unsigned short WORD;
 #define JMP 0b110
 #define JPZ 0b111
 
-//OP TYPES
+// OP TYPES
 #define DP 0b00
 #define MEM 0b01
 #define BCH 0b10
 #define SPC 0b11
-
 
 // ALU-OP
 // 0 +
@@ -105,7 +103,7 @@ unsigned char reg_D, src_A, src_B, alu_op, type, I, Z, L;
 void decode()
 {
     // start decoding
-    type = DP_GET_TYPE(INSTR);
+    type = GET_TYPE(INSTR);
     I = GET_I(INSTR);
 
     // DP && MEM
@@ -115,7 +113,7 @@ void decode()
         src_A = GET_DP_SRC_A(INSTR);
         src_B = I ? GET_DP_SRC_B_IMM(INSTR) : GET_DP_SRC_B_REG(INSTR);
 
-        switch (GET_FUNC(INSTR))
+        switch (GET_DP_FUNC(INSTR))
         {
         case ADD:
             alu_op = 0;
@@ -142,8 +140,7 @@ void decode()
     // JMP
     else if (type == BCH)
     {
-        src_A = R[REG_PC];
-        src_B = GET_JMP_IMM(INSTR);
+        src_A = GET_JMP_IMM(INSTR);
         Z = GET_Z(INSTR);
         alu_op = 0;
     }
@@ -168,6 +165,9 @@ WORD alu(WORD A, WORD B, unsigned char op)
         break;
     case 3:
         return A & B;
+        break;
+    default:
+        return 0;
         break;
     }
 }
@@ -282,26 +282,25 @@ int main(int argc, char **argv)
     run();
     printf("Final RAM status: \n");
 
-    //print RAM 
-    for(int i = 0; i < MEM_SIZE; i++)
+    // print RAM
+    for (int i = 0; i < MEM_SIZE; i++)
     {
-        printf("%04x ",RAM[i]);
-        if(i % MEM_M_SIZE == 3){
+        printf("%04x ", RAM[i]);
+        if (i % MEM_M_SIZE == 3)
+        {
             printf("\n");
         }
     }
 
     printf("Final REG status: \n");
-    //print REGS 
-    for(int i = 0; i < NREGS; i++)
+    // print REGS
+    for (int i = 0; i < NREGS; i++)
     {
         if (i == REG_PC)
-            printf("R%d (PC): %04x \n",i,R[i]);
+            printf("R%d (PC): %04x \n", i, R[i]);
         else
-            printf("R%d: %04x \n",i,R[i]);
-
+            printf("R%d: %04x \n", i, R[i]);
     }
-
 
     // EXIT
     return 0;
